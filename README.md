@@ -2,13 +2,12 @@
 
 ## DLQ concept
 
-DLQ mean DEAD-LETTER-QUEUE which is use to keep the messages, failed to process or consumed.
+- DLQ mean DEAD-LETTER-QUEUE which is use to keep the messages, failed to process or consumed.
 
 ## DLT in spring kafka consumer
 
-Similar as DLQ in spring kafka, we have similar concept but with different name, known as DLT (DEAD LETTER TOPIC).
-
-But before to use it, we need to provide ProducerFactory and KafkaTemplate configuration.
+- Similar as DLQ in spring kafka, we have similar concept but with different name, known as DLT (DEAD LETTER TOPIC).
+  But before to use it, we need to provide ProducerFactory and KafkaTemplate configuration.
 
 ```java
     @Bean
@@ -24,7 +23,7 @@ But before to use it, we need to provide ProducerFactory and KafkaTemplate confi
     }
 ```
 
-Then in listener class on '@KafkaListener' annotated method, We can apply @RetryableTopic with some important attributes.
+- Then in listener class on '@KafkaListener' annotated method, We can apply @RetryableTopic with some important attributes.
 
 ```java
     @RetryableTopic(attempts = "3",
@@ -48,9 +47,46 @@ Then in listener class on '@KafkaListener' annotated method, We can apply @Retry
         acknowledgementMessage(message, acknowledgment);
     }
 ```
+---
+***Note:*** attempts attribute in @RetryableTopic annotation perform given attempts - 1 retries because considering the initial call as well so here you will see only 2 retry calls.
+---
 
-- Note: attempts attribute in @RetryableTopic annotation perform given attempts - 1 retries because considering the initial call as well so here you will see only 2 retry calls.
+- If we want to listen that DLT topic and want to take some action like
+  - Notify the team to analyze the message content.
+  - Customer based on given message details.
+  Then in the same class you need to create a method similar as above given listener method and instead of listener you can specify '@DltHandler' annotation over the method.
 
-If we want to listen
+```java
+    @DltHandler
+    public void handleDltMessage(@Payload String message,
+                                @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+                                @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+                                @Header(KafkaHeaders.OFFSET) long offset,
+                                @Header(KafkaHeaders.RECEIVED_TIMESTAMP) long time,
+                                 Acknowledgment acknowledgment) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+        String mailTemplate = """
+                Hi Team,
+                
+                    We received a message from topic '%s' but due to some error we unable to process this message.
+                    Here are the details given below:
+               
+                    Dlt Topic: %s
+                    Partition: %d
+                    Offset: %d
+                    Timestamp: %s
+               
+                    Kindly check this message: %s
+                
+                Thanks
+                Gourav Kumar
+                """.formatted(topic.split("-")[0], topic, partition, offset, zonedDateTime, message);
+        log.info("Sent email");
+        System.out.println(mailTemplate);
+        acknowledgementMessage(message, acknowledgment);
+    }
+```
+
+
 
 
