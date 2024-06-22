@@ -87,6 +87,22 @@
     }
 ```
 
+- Now lets discuss one interesting attributes of @RetryableTopic annotation which is dltStrategy.
+  Here you can specify any strategy based on your use case such as
+  - ALWAYS_RETRY_ON_ERROR (Default): If i want to do some retry based on given 'attempts' attribute and if still not consumed then send message in DLT.
+  - FAIL_ON_ERROR: No retries, If failed to consume the message then directly send into DLT.
+  - NO_DLT: Nothing (No retries, No DLT transfer)
+    
+```java
+  public enum DltStrategy {
+      NO_DLT,
+      ALWAYS_RETRY_ON_ERROR,
+      FAIL_ON_ERROR;
+  
+      private DltStrategy() {
+      }
+  }
+```
 
 
 
