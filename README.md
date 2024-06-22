@@ -47,9 +47,9 @@
         acknowledgementMessage(message, acknowledgment);
     }
 ```
---
-*Note:* attempts attribute in @RetryableTopic annotation perform given attempts - 1 retries because considering the initial call as well so here you will see only 2 retry calls.
---
+
+***Note:*** attempts attribute in @RetryableTopic annotation perform given attempts - 1 retries because considering the initial call as well so here you will see only 2 retry calls.
+
 
 - If we want to listen that DLT topic and want to take some action like
   - Notify the team to analyze the message content.
