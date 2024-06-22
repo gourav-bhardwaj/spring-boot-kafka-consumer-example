@@ -19,15 +19,15 @@ import java.time.ZonedDateTime;
 @Component
 public class CustomKafkaListener {
 
-//    @RetryableTopic(attempts = "4",
+    //    @RetryableTopic(attempts = "4",
 //            kafkaTemplate = "retryTopicKafkaTemplate",
 //            dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR, // Both DLT, Retry topic with Delay retry topics
 //            backoff = @Backoff(delayExpression = "${kafka.delay.ms}",
 //                    multiplierExpression = "${kafka.delay.multiplier}",
 //                    maxDelayExpression = "${kafka.delay.max.ms}"))
-    @RetryableTopic(attempts = "1",
+    @RetryableTopic(attempts = "3",
             kafkaTemplate = "retryTopicKafkaTemplate",
-            dltStrategy = DltStrategy.FAIL_ON_ERROR // No retry send it into DEAD-LETTER-TOPIC without retries
+            dltStrategy = DltStrategy.ALWAYS_RETRY_ON_ERROR // No retry send it into DEAD-LETTER-TOPIC without retries
 //            dltStrategy = DltStrategy.NO_DLT // No DLT and retries
     )
     @KafkaListener(groupId = "${kafka.consumer.group-id}",
@@ -43,7 +43,7 @@ public class CustomKafkaListener {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
         log.info("Topic: {}, Partition: {}, Offset: {}, Timestamp: {}", topic, partition, offset, zonedDateTime);
         log.info("Message to process: {}", message);
-        if(message.equalsIgnoreCase("Break")) {
+        if(message.equalsIgnoreCase("Break") && topic.equalsIgnoreCase("myfirsttopic")) {
             throw new InvalidReceivedMessage("Dummy exception thrown!!");
         }
         acknowledgementMessage(message, acknowledgment);
@@ -51,10 +51,10 @@ public class CustomKafkaListener {
 
     @DltHandler
     public void handleDltMessage(@Payload String message,
-                                @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
-                                @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
-                                @Header(KafkaHeaders.OFFSET) long offset,
-                                @Header(KafkaHeaders.RECEIVED_TIMESTAMP) long time,
+                                 @Header(KafkaHeaders.RECEIVED_TOPIC) String topic,
+                                 @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
+                                 @Header(KafkaHeaders.OFFSET) long offset,
+                                 @Header(KafkaHeaders.RECEIVED_TIMESTAMP) long time,
                                  Acknowledgment acknowledgment) {
         ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
         String mailTemplate = """
