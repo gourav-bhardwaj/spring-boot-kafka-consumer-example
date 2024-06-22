@@ -1,0 +1,19 @@
+server:
+  port: 8099
+
+spring:
+  application:
+    name: spring-boot-kafka-consumer-example
+
+kafka:
+  consumer:
+    bootstrap-servers: 127.0.0.1:9092
+    group-id: my-first-consumer-group-1
+    topics: myfirsttopic
+    key-deserialization: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserialization: org.apache.kafka.common.serialization.StringDeserializer
+  delay:
+    ms: 1000
+    multiplier: 2
+    max:
+      ms: 5000
