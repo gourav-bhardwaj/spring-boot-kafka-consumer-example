@@ -14,7 +14,7 @@ import java.util.Map;
 @Configuration
 public class KafkaProducerConfig {
 
-    private CustomKafkaProperties kafkaProperties;
+    private final CustomKafkaProperties kafkaProperties;
 
     public KafkaProducerConfig(CustomKafkaProperties kafkaProperties) {
         this.kafkaProperties = kafkaProperties;
@@ -29,7 +29,9 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, String> retryTopicKafkaTemplate(ProducerFactory<String, String> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
+        KafkaTemplate<String, String> kafkaTemplate = new KafkaTemplate<>(producerFactory);
+        kafkaTemplate.setObservationEnabled(true);
+        return kafkaTemplate;
     }
 
 }

@@ -17,3 +17,10 @@ kafka:
     multiplier: 2
     max:
       ms: 5000
+
+#management:
+#  tracing:
+#    propagation:
+#      consume:
+#        - "b3"
+#        - "w3c"
