@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: spring-boot-kafka-consumer-example-test
+
+kafka:
+  consumer:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    group-id: test-consumer-group
+    topics: myfirsttopic
+    key-deserialization: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserialization: org.apache.kafka.common.serialization.StringDeserializer
+  delay:
+    ms: 1000
+    multiplier: 2
+    max:
+      ms: 5000
