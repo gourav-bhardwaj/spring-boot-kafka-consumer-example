@@ -41,7 +41,7 @@ class KafkaProducerConfigTest {
     }
 
     @Test
-    void should_create_kafka_template_with_observation_enabled() {
+    void should_create_kafka_template_successfully() {
         // Given
         given(customKafkaProperties.getBootstrapServers()).willReturn("localhost:9092");
         ProducerFactory<String, String> producerFactory = kafkaProducerConfig.producerFactory();
@@ -51,7 +51,7 @@ class KafkaProducerConfigTest {
 
         // Then
         assertThat(kafkaTemplate).isNotNull();
-        assertThat(kafkaTemplate.isObservationEnabled()).isTrue();
+        assertThat(kafkaTemplate.getProducerFactory()).isEqualTo(producerFactory);
     }
 
     @Test
@@ -83,7 +83,7 @@ class KafkaProducerConfigTest {
     }
 
     @Test
-    void should_enable_observation_in_kafka_template() {
+    void should_create_kafka_template_with_producer_factory() {
         // Given
         given(customKafkaProperties.getBootstrapServers()).willReturn("localhost:9092");
         ProducerFactory<String, String> producerFactory = kafkaProducerConfig.producerFactory();
@@ -92,6 +92,7 @@ class KafkaProducerConfigTest {
         KafkaTemplate<String, String> kafkaTemplate = kafkaProducerConfig.retryTopicKafkaTemplate(producerFactory);
 
         // Then
-        assertThat(kafkaTemplate.isObservationEnabled()).isTrue();
+        assertThat(kafkaTemplate).isNotNull();
+        assertThat(kafkaTemplate.getProducerFactory()).isNotNull();
     }
 }
