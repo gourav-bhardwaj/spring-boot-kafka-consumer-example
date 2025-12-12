@@ -44,7 +44,22 @@ considerations.
     - Mock service dependencies; verify status codes, serialization, validation, exception handling.
 
 7. **Testcontainers / External System Testing**
-    - Required to use `Testcontainers` for Kafka test cases implementations (or in-memory alternatives), especially for versions where defaults may have changed.
+    - For DB and general external integration: use `Testcontainers` (or in-memory alternatives), especially for versions where defaults may have changed.
+    - **Kafka Testing Strategy (MANDATORY):**
+        - **Strictly Avoid Mocking:** Do not mock `KafkaTemplate`, `KafkaConsumer`, or `KafkaListener` components.
+        - **Use Testcontainers:** The agent must write logic to spin up a real Kafka broker using `Testcontainers`.
+        - **One-Shot Example:**
+            > *Agent must generate setup logic similar to this:*
+            > ```java
+            > @Container
+            > static KafkaContainer kafka = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"));
+            >
+            > @DynamicPropertySource
+            > static void overrideProperties(DynamicPropertyRegistry registry) {
+            >     registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+            > }
+            > ```
+        - **Implementation Requirement:** When implementing Kafka tests, the agent **must write the Testcontainers logic shown above**. The test must publish a real message to the topic and assert that the application consumed/processed it (or vice-versa), ensuring full integration verification without mocks.
 
 8. **Version-Specific Considerations**
 
