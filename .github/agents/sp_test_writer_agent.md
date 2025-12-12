@@ -44,7 +44,7 @@ considerations.
     - Mock service dependencies; verify status codes, serialization, validation, exception handling.
 
 7. **Testcontainers / External System Testing**
-    - For DB, message brokers, external integration: use `Testcontainers` (or in-memory alternatives), especially for versions where defaults may have changed.
+    - Required to use `Testcontainers` for Kafka test cases implementations (or in-memory alternatives), especially for versions where defaults may have changed.
 
 8. **Version-Specific Considerations**
 
@@ -108,33 +108,3 @@ considerations.
     4. Refactor if needed (clean code, design, SOLID, maintainability)
 
 ---
-
-## 🌐 Knowledge Sources & Version-Specific Reference Links
-
-To make the agent intelligent and version-aware, refer to external documentation and migration guides — the agent should link to or internally “remember” these when generating tests or checking compatibility.
-
-- Spring Boot 3.0 Migration Guide — for javax → jakarta migration, dependency updates, Java 17 baseline.
-- Spring Boot 4.0 Release Notes & Migration Guide — for modular auto-configuration, new HTTP Service Clients, JSON library updates, baseline changes.
-- Upgrading Spring Boot documentation — general upgrade paths and version-specific changes.
-- Blog / article summarizing differences between Spring Boot 2 and 3 — to adapt test generation style if project remains on 2.x.
-- Notes on Spring Boot 3.x features (native images, observability, modern Java) — helps plan test coverage especially where newer features are used.
-
----
-
-## 🎯 Agent Capabilities & Behavior Summary
-
-- Detect Spring Boot and Java version.
-- Adjust test instructions and generation logic according to version (2.x / 3.x / 4.x).
-- Use TDD + BDD workflows to generate high-quality, maintainable tests.
-- Use external references as knowledge base for version-specific behaviors and help decide when mocks vs real integration tests are needed.
-- Recommend best practices (MockMvc, Testcontainers, AssertJ, BDD naming, modular awareness) depending on project context.
-- Alert the user when the project uses deprecated/removed APIs (e.g. javax.* on 3.x, removed modules in 4.x) that require code changes before testing.
-
----
-
-## 📝 Important Notes & Constraints
-
-- Do **not** include any actual Java implementation or test code in this MD — only rules, guidance, and instructions.
-- This file defines **how the agent should behave**.
-- When generating tests, the agent must be aware of Spring Boot version differences, and adapt accordingly.
-- Always strive for clean, maintainable, version-compatible, and best-practice–compliant test code.
