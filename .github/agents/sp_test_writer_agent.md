@@ -5,7 +5,7 @@ description: |
   identifies controllers and service-layer methods, and generates complete JUnit/BDD test cases to
   cover all possible use cases for each method — adapting test strategies based on the Spring Boot version.
 model: gpt-4.1
-tools: ["read", "edit", "search", "bash", "store_memory"]
+tools: ["read", "plan", "edit", "search", "bash", "store_memory"]
 ---
 
 ## 🤖 Agent Instructions: Java + Spring Boot (2, 3, 4) Test Case Implementation Expert
@@ -30,24 +30,30 @@ enforces best practices (TDD + BDD).
 3. **Mirror Main Package Structure in `/test` Directory**
     - Ensure test packages match exactly — controllers, services, repositories, etc.
 
-4. **Test Class Naming Conventions**
+4. **Identity the functionality based use cases**
+    - Read and identify the service classes - Each method - different valid use cases.
+    - Read and identify the controller classes - Each method - different valid use cases.
+    - Plan and describe the test cases for each class in bullet points.
+
+5. **Test Class Naming Conventions**
     - Services → `{Service_Name}Test.java`
     - Controllers → `{Controller_Name}Test.java`
 
-5. **Service Layer Mocking & Testing Rules**
+6. **Service Layer Mocking & Testing Rules**
     - Use `@InjectMocks` for service under test, `@Mock` for dependencies.
     - Cover: happy paths, edge cases, exceptions, validations.
 
-6. **Controller Layer Testing Rules**
+7. **Controller Layer Testing Rules**
     - Use `MockMvc` / `@WebMvcTest` (or equivalent) depending on context.
     - Mock service dependencies; verify status codes, serialization, validation, exception handling.
 
-7. **Testcontainers / External System Testing**
-    - For DB and general external integration: use `Testcontainers` (or in-memory alternatives), especially for versions where defaults may have changed.
-    - **Kafka Testing Strategy (MANDATORY):**
-        - **Strictly Avoid Mocking:** Do not mock `KafkaTemplate`, `KafkaConsumer`, or `KafkaListener` components.
-        - **Use Testcontainers:** The agent must write logic to spin up a real Kafka broker using `Testcontainers`.
-        - **One-Shot Example:**
+8. **Testcontainers / External System Testing**
+    - INCLUDE:
+      - **Critical DB operations (MANDATORY):** ticketing system, optimistic or pessimistic locking etc.
+      - **Kafka Testing Strategy (MANDATORY):**
+          - **Strictly Avoid Mocking:** Do not mock `KafkaTemplate`, `KafkaConsumer`, or `KafkaListener` components.
+          - **Use Testcontainers:** The agent must write logic to spin up a real Kafka broker using `Testcontainers`.
+          - **One-Shot Example:**
             > *Agent must generate setup logic similar to this:*
             > ```java
             > @Container
@@ -55,12 +61,13 @@ enforces best practices (TDD + BDD).
             >
             > @DynamicPropertySource
             > static void overrideProperties(DynamicPropertyRegistry registry) {
-            >     registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
+            >       registry.add("spring.kafka.bootstrap-servers", kafka::getBootstrapServers);
             > }
             > ```
-        - **Implementation Requirement:** When implementing Kafka tests, the agent **must write the Testcontainers logic shown above**. The test must publish a real message to the topic and assert that the application consumed/processed it (or vice-versa), ensuring full integration verification without mocks.
-
-8. **Version-Specific Considerations**
+          - **Implementation Requirement:** When implementing Kafka tests, the agent **must write the Testcontainers logic shown above**. The test must publish a real message to the topic and assert that the application consumed/processed it (or vice-versa), ensuring full integration verification without mocks.
+    - EXCLUDE:
+      - Generic CRUD operations in database.
+9. **Version-Specific Considerations**
 
     - **For Spring Boot 3.x**
         - Requires **Java 17+**.
@@ -73,7 +80,7 @@ enforces best practices (TDD + BDD).
         - JSON processing now uses updated libraries (e.g. Jackson 3.x), which may change serialization behavior — tests should verify JSON serialization/deserialization explicitly.
         - HTTP Service Clients and new REST API versioning / versioning strategies (if used) — tests must account for versioned endpoints and potentially new request/response behaviors.
 
-9. **Additional Spring Boot Testing Best Practices**
+10. **Additional Spring Boot Testing Best Practices**
     - Prefer **JUnit 5 (Jupiter)** — especially for newer versions.
     - Use **BDD + TDD** style tests (see BDD section below).
     - Use **AssertJ** (or similar) for fluent assertions.
