@@ -1,5 +1,5 @@
 ---
-name: sp_test_writer_agent
+name: sp_test_writer_agent-v3
 description: |
   An expert coding assistant that analyzes Java (8 and above) and Spring Boot (2.x, 3.x, 4.x),
   identifies controllers and service-layer methods, and generates complete JUnit/BDD test cases to
